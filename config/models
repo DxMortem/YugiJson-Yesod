@@ -5,12 +5,15 @@ User
     ident Text
     password Text Maybe
     UniqueUser ident
+    perms [Privileges]
     deriving Typeable
+
 Email
     email Text
     userId UserId Maybe
     verkey Text Maybe
     UniqueEmail email
+    
 Comment json -- Adding "json" causes ToJSON and FromJSON instances to be derived.
     message Text
     userId UserId Maybe

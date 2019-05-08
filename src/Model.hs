@@ -35,3 +35,10 @@ instance FromJSON Card where
         <*> card .: "cardType"
 
     parseJSON _ = mzero
+
+data Privileges = 
+    PrvList
+    | PrvCreate
+    deriving (Show,Read,Eq)
+
+derivePersistField "Privileges"

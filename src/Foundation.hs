@@ -25,6 +25,8 @@ import Yesod.Core.Types     (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Text.Encoding as TE
+import qualified Data.List as L
+import Yesod.Auth.OAuth2.Google
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -47,6 +49,14 @@ data MenuItem = MenuItem
 data MenuTypes
     = NavbarLeft MenuItem
     | NavbarRight MenuItem
+
+-- Replace with Google client ID.
+clientId :: Text
+clientId = "237706250338-1v330so17fa07ncpu3205dls73f9vm6u.apps.googleusercontent.com"
+
+-- Replace with Google secret ID.
+clientSecret :: Text
+clientSecret = "moYwXBjmVGiFar-vD2Rvb1NS" 
 
 -- This is where we define all of the routes in our application. For a full
 -- explanation of the syntax, please see:
@@ -166,8 +176,8 @@ instance Yesod App where
     isAuthorized FaviconR _ = return Authorized
     isAuthorized RobotsR _ = return Authorized
     isAuthorized (StaticR _) _ = return Authorized
-    isAuthorized CardsJsonR _ = return Authorized
-    isAuthorized (CardJsonR _) _ = return Authorized
+    isAuthorized CardsJsonR _ = authorizedForPrivileges [PrvList]
+    isAuthorized (CardJsonR _) _ = authorizedForPrivileges [PrvCreate]
     
     -- the profile route requires that the user is authenticated, so we
     -- delegate to that function
@@ -256,13 +266,13 @@ instance YesodAuth App where
             Nothing -> Authenticated <$> insert User
                 { userIdent = credsIdent creds
                 , userPassword = Nothing
+                , userPerms = []
                 }
 
     -- You can add other plugins like Google Email, email or OAuth here
     authPlugins :: App -> [AuthPlugin App]
-    authPlugins app = [authOpenId Claimed []] ++ extraAuthPlugins
+    authPlugins app = [oauth2GoogleScoped ["email", "profile"] clientId clientSecret]
         -- Enable authDummy login if enabled.
-        where extraAuthPlugins = [authDummy | appAuthDummyLogin $ appSettings app]
 
 -- | Access function to determine if a user is logged in.
 isAuthenticated :: Handler AuthResult
@@ -271,6 +281,20 @@ isAuthenticated = do
     return $ case muid of
         Nothing -> Unauthorized "You must login to access this page"
         Just _ -> Authorized
+
+authorizedForPrivileges :: [Privileges] -> Handler AuthResult
+authorizedForPrivileges perms = do
+    mu <- maybeAuth
+    return $ case mu of
+     Nothing -> Unauthorized "You must login to access this page"
+     Just u@(Entity userId user) ->
+       if hasPrivileges u perms
+            then Authorized
+            else Unauthorized "Not enought priviledges"
+
+hasPrivileges :: Entity User -> [Privileges] -> Bool
+hasPrivileges (Entity _ user) perms = null (perms L.\\ userPerms user)
+
 
 instance YesodAuthPersist App
 
