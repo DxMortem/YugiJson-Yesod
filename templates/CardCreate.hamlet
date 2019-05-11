@@ -1,0 +1,9 @@
+$doctype 5
+<html>
+    <head>
+        <title>
+    <body>
+        <form method=post action=@{actionR} encType=#{encoding}>
+              <h1> Add a new card
+              ^{widget}
+              <button href=@{CardNewR} .btn .btn-danger > Add Card

@@ -1,0 +1,18 @@
+$doctype 5
+<html>
+    <head>
+        <title>
+    <body>
+        <div>
+          <table .table .table-responsive .table-hover>
+              <thead>
+                     <th> Name
+                     <th> Description
+                     <th> Type
+
+              $forall Entity cardId cardbody <- allcards
+                <tbody>
+                      <tr>
+                          <td> #{cardName cardbody}
+                          <td> #{cardDescription cardbody}
+                          <td> #{cardType cardbody}

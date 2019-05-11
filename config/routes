@@ -16,3 +16,7 @@
 /cardJson  CardsJsonR GET POST
 
 /cardJson/#CardId  CardJsonR GET PUT DELETE
+
+/card CardListR GET
+
+/card/create CardNewR GET POST

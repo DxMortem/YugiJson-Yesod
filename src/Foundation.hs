@@ -176,9 +176,10 @@ instance Yesod App where
     isAuthorized FaviconR _ = return Authorized
     isAuthorized RobotsR _ = return Authorized
     isAuthorized (StaticR _) _ = return Authorized
-    isAuthorized CardsJsonR _ = authorizedForPrivileges [PrvList]
-    isAuthorized (CardJsonR _) _ = authorizedForPrivileges [PrvCreate]
-    
+    isAuthorized CardsJsonR _ = authorizedForPrivileges [PrvJson]
+    isAuthorized (CardJsonR _) _ = authorizedForPrivileges [PrvJson]
+    isAuthorized CardNewR _ = authorizedForPrivileges [PrvCreate]
+    isAuthorized CardListR _= isAuthenticated
     -- the profile route requires that the user is authenticated, so we
     -- delegate to that function
     isAuthorized ProfileR _ = isAuthenticated

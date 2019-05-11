@@ -37,7 +37,7 @@ instance FromJSON Card where
     parseJSON _ = mzero
 
 data Privileges = 
-    PrvList
+    PrvJson
     | PrvCreate
     deriving (Show,Read,Eq)
 
